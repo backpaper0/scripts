@@ -7,11 +7,7 @@ end
 client = Slack::Web::Client.new
 client.auth_test
 
-channels = client.channels_list.channels
-
-channel = channels.find { |c| c.name == "general" }.id
-
-files = client.files_list(channel: channel).files
+files = client.files_list.files
 
 files.each { |file|
   puts "delete file: #{file.name}"
