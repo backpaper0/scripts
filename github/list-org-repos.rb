@@ -32,7 +32,7 @@ while path do
   link = resp.header["link"].split(/\s*,\s*/)
     .map { |a| /<https:\/\/api\.github\.com([^>]+)>;\s*rel="([^"]+)"/.match(a) }
     .map { |a| [a[1], a[2]]}
-    .find { |a| a[1] == "next" }
+    .find { |a| a[1] == "next" } if resp.header["link"]
 
   path = nil
   path = link[0] if link
