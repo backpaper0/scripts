@@ -8,14 +8,11 @@ unless org then
   exit(1)
 end
 
-http = Net::HTTP.new("api.github.com", 443)
-http.use_ssl = true
-
-path = "/orgs/#{org}/repos"
+path = "https://api.github.com/orgs/#{org}/repos"
 
 while path do
 
-  resp = http.get(path)
+  resp = Net::HTTP.get_response(URI.parse(path))
 
   exit(1) if resp.code != "200"
   if resp.code != "200" then
@@ -30,7 +27,7 @@ while path do
 
   # Linkヘッダーをパースして次のページを取得する
   link = resp.header["link"].split(/\s*,\s*/)
-    .map { |a| /<https:\/\/api\.github\.com([^>]+)>;\s*rel="([^"]+)"/.match(a) }
+    .map { |a| /<([^>]+)>;\s*rel="([^"]+)"/.match(a) }
     .map { |a| [a[1], a[2]]}
     .find { |a| a[1] == "next" } if resp.header["link"]
 
