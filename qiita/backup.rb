@@ -17,9 +17,7 @@ unless resp.code == "200" then
   exit(1)
 end
 
-items = resp.body
-
-ids = JSON.parse(items).map { |item| item["id"] }
+ids = JSON.parse(resp.body).map { |item| item["id"] }
 
 if ids.empty? then
   puts "記事がない"
@@ -32,8 +30,7 @@ ids.each do |id|
   uri = URI.parse("#{base_url}/items/#{id}")
   resp = Net::HTTP.get_response(uri)
   if resp.code == "200" then
-    item = resp.body
-    body = JSON.parse(item)["body"]
+    body = JSON.parse(resp.body)["body"]
     open("backup/#{id}.md", "w") do |io|
       io.puts(body)
     end
