@@ -1,4 +1,5 @@
 require "json"
+require "net/http"
 
 base_url = "https://qiita.com/api/v2"
 
@@ -8,12 +9,15 @@ unless username then
   exit(1)
 end
 
-items = `curl -s #{base_url}/users/#{username}/items`
+uri = URI.parse("#{base_url}/users/#{username}/items")
+resp = Net::HTTP.get_response(uri)
 
-unless $?.exitstatus == 0 then
+unless resp.code == "200" then
   puts "記事一覧を取得できなかった"
   exit(1)
 end
+
+items = resp.body
 
 ids = JSON.parse(items).map { |item| item["id"] }
 
@@ -25,8 +29,10 @@ end
 Dir.mkdir("backup")
 
 ids.each do |id|
-  item = `curl -s #{base_url}/items/#{id}`
-  if $?.exitstatus == 0 then
+  uri = URI.parse("#{base_url}/items/#{id}")
+  resp = Net::HTTP.get_response(uri)
+  if resp.code == "200" then
+    item = resp.body
     body = JSON.parse(item)["body"]
     open("backup/#{id}.md", "w") do |io|
       io.puts(body)
